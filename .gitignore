@@ -1,6 +1,6 @@
 
-node_modules/    # Node.js bağımlılıkları
-.env             # Ortam değişkenleri dosyası
+node_modules/   
+.env            
 
 # Log dosyaları
 *.log
