@@ -1,0 +1,25 @@
+
+node_modules/    # Node.js bağımlılıkları
+.env             # Ortam değişkenleri dosyası
+
+# Log dosyaları
+*.log
+
+# Geçici dosyalar
+tmp/
+
+# Yedek dosyalar
+*.bak
+*.backup
+
+# Derleme çıktıları
+dist/
+build/
+
+# IDE özel dosyaları
+.vscode/
+.idea/
+
+# Kişisel konfigürasyon dosyaları
+*.config
+*.conf
