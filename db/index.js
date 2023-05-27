@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const password = process.env.DB_PASSWORD;
 const user = process.env.DB_USER;
 
-const uri = `mongodb+srv://${user}:${password}@shop.gcs4ua6.mongodb.net`;
+const dbName = process.env.NODE_ENV === 'production' ? 'shop' : 'test';
+
+const uri = `mongodb+srv://${user}:${password}@shop.gcs4ua6.mongodb.net/${dbName}`;
 
 async function connectToDatabase() {
   try {

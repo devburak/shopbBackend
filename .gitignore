@@ -23,3 +23,7 @@ build/
 # Kişisel konfigürasyon dosyaları
 *.config
 *.conf
+
+# seed dosyaları
+db/seeds/
+seed.js
