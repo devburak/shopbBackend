@@ -3,7 +3,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../db/models/user');
-const { jwtAuthMiddleware } = require('./middleware');
+const Profile = require('../db/models/profile');
+const  jwtAuthMiddleware = require('./middleware');
 
 // Tüm kullanıcıların rolünü güncelleme (Sadece admin yetkisi gerektirir)
 router.put('/users/:userId/role', jwtAuthMiddleware, async (req, res) => {
@@ -30,10 +31,10 @@ router.put('/users/:userId/role', jwtAuthMiddleware, async (req, res) => {
     // Kullanıcıyı kaydet
     await user.save();
 
-    res.json({ message: 'Kullanıcının rolü güncellendi' });
+   return  res.json({ message: 'Kullanıcının rolü güncellendi' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Sunucu hatası' });
+   return res.status(500).json({ message: 'Sunucu hatası' });
   }
 });
 
@@ -71,12 +72,37 @@ router.post('/user', jwtAuthMiddleware, async (req, res) => {
       // Kullanıcıyı kaydetme
       await user.save();
   
-      res.status(201).json({ message: 'Kullanıcı oluşturuldu' });
+      return res.status(201).json({ message: 'Kullanıcı oluşturuldu' });
     } catch (err) {
-      res.status(500).json({ error: 'Kullanıcı oluşturulurken bir hata oluştu' });
+      return res.status(500).json({ error: 'Kullanıcı oluşturulurken bir hata oluştu' });
     }
   });
   
+// Kullanıcının profil ve kullanıcı bilgilerini silme
+router.delete('/users/:userId', jwtAuthMiddleware, async (req, res) => {
+  try {
+    const { userId } = req.params;
 
+    // Kullanıcının rolünü kontrol et
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Sadece admin kullanıcılar bu işlemi gerçekleştirebilir' });
+    }
+
+    // Kullanıcının profil bilgilerini sil
+    await Profile.findOneAndDelete({ userId });
+
+    // Kullanıcının kullanıcı bilgilerini sil
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!deletedUser) {
+      return res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+    }
+
+    res.json({ message: 'Kullanıcı profil ve bilgileri başarıyla silindi' });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'Sunucu hatası' });
+  }
+});
 
 module.exports = router;
+
