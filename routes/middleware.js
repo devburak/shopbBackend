@@ -7,7 +7,8 @@ const jwtAuthMiddleware = (req, res, next) => {
   try {
     const decoded = jwtConfig.verifyToken(token);
     const userId = decoded.userId;
-    req.user = { userId }; // Kullanıcı kimliğini istek nesnesine ekle
+    const role = decoded.role; // Kullanıcının rolünü al
+    req.user = { userId,role }; // Kullanıcı kimliğini istek nesnesine ekle
     next();
   } catch (error) {
     res.status(401).json({ error: 'Geçersiz token' });
