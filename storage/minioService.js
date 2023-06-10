@@ -75,6 +75,25 @@ async function uploadFile(bucketName, file,uploadedBy ) {
   }
 }
 
+function deleteFile (bucketName, fileId, fileName) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Veritabanından dosyayı sil
+        await deleteFileFromDatabase(fileId);
+  
+        // MinIO'dan dosyayı sil
+        await deleteFileFromStorage(bucketName, fileName);
+  
+        console.log('Dosya başarıyla silindi.');
+        resolve(fileName); // Silinen dosyanın adını döndür
+      } catch (error) {
+        console.error('Dosya silme hatası:', error);
+        reject(error); // Hata durumunu döndür
+      }
+    });
+  };
+  
+
 // Verilen dosya uzantısının bir resim dosyası olup olmadığını kontrol eder
 function isImageFile(fileExtension) {
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
@@ -87,4 +106,15 @@ async function getFileUrl(bucketName, fileName) {
   return objectUrl?.split('?')[0];
 }
 
-module.exports = {uploadFile};
+const deleteFileFromDatabase = async (fileId) => {
+    await StoredFile.deleteOne({ _id: fileId });
+};
+
+const deleteFileFromStorage = async (bucketName, fileName) => {
+   console.log( `thumbnails/${path.parse(fileName).name}.webp`);
+    await minioClient.removeObject(bucketName, fileName);
+    await minioClient.removeObject(bucketName, `/thumbnails/th_${path.parse(fileName).name}.webp`);
+};
+  
+
+module.exports = {uploadFile ,deleteFile};
