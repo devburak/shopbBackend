@@ -9,21 +9,9 @@ const discountSchema = new mongoose.Schema({
   });
 
 const productSchema = new mongoose.Schema({
-  name: {
-    tr: { type: String, required: true },
-    en: { type: String, required: true },
-    gr: { type: String, required: true },
-  },
-  content: {
-    tr: { type: String, required: true },
-    en: { type: String, required: true },
-    gr: { type: String, required: true },
-  },
-  allergenWarnings: {
-    tr: { type: String },
-    en: { type: String },
-    gr: { type: String },
-  },
+  name: { type: String, required: true },
+  content: { type: String, required: true },
+  allergenWarnings: { type: String },
   salesType: { type: String, required: true },
   price: { type: Number, required: true },
   stock: { type: Number, default: 0 },

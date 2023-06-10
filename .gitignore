@@ -27,3 +27,7 @@ build/
 # seed dosyaları
 db/seeds/
 seed.js
+
+
+# temp files
+uploads/
