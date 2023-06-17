@@ -25,7 +25,33 @@ router.post('/', jwtAuthMiddleware, async (req, res) => {
     }
   });
 
+  router.get('/',jwtAuthMiddleware, async (req, res) => {
+    try {
+      // Kullanıcının kimliğini alın
+    const userId = req.user.userId;
+
+    // Kullanıcı profili bilgilerini getir
+    const userProfile = await Profile.findOne({ userId }).populate('userId', 'username name email phone role');
+
+    if (!userProfile) {
+      // Kullanıcı profili bulunamadıysa, sadece User modelinden bilgileri getir
+      const user = await User.findById(userId).select('_id as userId username name email phone role');
+      if (!user) {
+        return res.status(404).json({ error: 'Kullanıcı bilgisi bulunamadı' });
+      }
+      // Kullanıcı bilgilerini döndür
+      res.status(200).json({user: { ...user._doc, userId: user._id } });
+    } else {
+      // Kullanıcı profili bulunduysa, profil ve User modelinden bilgileri birleştirerek döndür
+      const mergedProfile = { ...userProfile._doc, ...userProfile.userId._doc };
+      res.status(200).json({ userProfile: mergedProfile });
+    }
   
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'Bir hata oluştu' });
+    }
+  });
   // Profil güncelleme
   router.put('/', jwtAuthMiddleware, async (req, res) => {
     try {
