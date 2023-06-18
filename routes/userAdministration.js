@@ -4,15 +4,15 @@ const express = require('express');
 const router = express.Router();
 const User = require('../db/models/user');
 const Profile = require('../db/models/profile');
-const  jwtAuthMiddleware = require('./middleware');
-
+const jwtAuthMiddleware = require('../middleware/jwtAuth');
+const isAdmin = require('../middleware/jwtAuth.js')
 // Tüm kullanıcıların rolünü güncelleme (Sadece admin yetkisi gerektirir)
-router.put('/users/:userId/role', jwtAuthMiddleware, async (req, res) => {
+router.put('/users/:userId/role', jwtAuthMiddleware,isAdmin, async (req, res) => {
   try {
     // Yetkilendirme kontrolü: Sadece "admin" rolüne sahip kullanıcılar erişebilir
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Yetkisiz erişim' });
-    }
+    // if (req.user.role !== 'admin') {
+    //   return res.status(403).json({ message: 'Yetkisiz erişim' });
+    // }
 
     // Güncellenecek kullanıcının id'sini al
     const userId = req.params.userId;
@@ -103,6 +103,8 @@ router.delete('/users/:userId', jwtAuthMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Sunucu hatası' });
   }
 });
+
+
 
 module.exports = router;
 

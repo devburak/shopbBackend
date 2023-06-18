@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../db/models/user');
 const Profile = require('../db/models/profile');
-const jwtAuthMiddleware = require('./middleware');
+const jwtAuthMiddleware = require('../middleware/jwtAuth');
 const  jwt =require ("jsonwebtoken");
 const router = express.Router();
 
@@ -117,6 +117,8 @@ router.put('/profile' ,jwtAuthMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Error: profile update' });
   }
 });
+
+
 
 
 

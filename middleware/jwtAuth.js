@@ -15,4 +15,14 @@ const jwtAuthMiddleware = (req, res, next) => {
   }
 };
 
+function isAdmin(req, res,jwtAuthMiddleware, next) {
+  const { role } = req.user;
+  if (role !== 'admin') {
+    return res.status(403).json({ error: 'Bu işlem için yetkiniz yok' });
+  }
+  next();
+}
+
 module.exports = jwtAuthMiddleware;
+// isAdmin fonksiyonunu dışarıya aktar (isteğe bağlı)
+module.exports.isAdmin = isAdmin;
