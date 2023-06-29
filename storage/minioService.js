@@ -111,7 +111,6 @@ const deleteFileFromDatabase = async (fileId) => {
 };
 
 const deleteFileFromStorage = async (bucketName, fileName) => {
-   console.log( `thumbnails/${path.parse(fileName).name}.webp`);
     await minioClient.removeObject(bucketName, fileName);
     await minioClient.removeObject(bucketName, `/thumbnails/th_${path.parse(fileName).name}.webp`);
 };
