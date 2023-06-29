@@ -25,6 +25,18 @@ router.get('/', async (req, res) => {
     }
   });
 
+router.get('/byid/:id', async (req,res)=>{
+    try{
+        const {id} = req.params
+        const product = await Product.findById(id ).populate('categories storedFiles')
+        res.status(200).json(product)
+
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: 'Bir hata oluştu'})
+
+    }
+})
 
 // Create New Product
 router.post('/',jwtAuthMiddleware, async (req, res) => {
