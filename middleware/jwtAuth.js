@@ -23,6 +23,14 @@ function isAdmin(req, res,jwtAuthMiddleware, next) {
   next();
 }
 
+function isAdminroStaff(req, res,jwtAuthMiddleware, next) {
+  const { role } = req.user;
+  if (role !== 'admin' || role !=='staff') {
+    return res.status(403).json({ error: 'Bu işlem için yetkiniz yok' });
+  }
+  next();
+}
 module.exports = jwtAuthMiddleware;
 // isAdmin fonksiyonunu dışarıya aktar (isteğe bağlı)
 module.exports.isAdmin = isAdmin;
+module.exports.isAdminroStaff = isAdminroStaff;

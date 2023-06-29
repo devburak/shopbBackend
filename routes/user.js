@@ -31,7 +31,6 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { identifier, password } = req.body;
-
     const user = await User.findOne({
       $or: [
         { username: identifier },
@@ -69,7 +68,7 @@ router.post('/refresh-token', async (req, res) => {
     const { refreshToken } = req.body;
 
     // Refresh token'ı kontrol et ve kullanıcının bilgilerini al
-    const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const decodedToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
     const userId = decodedToken.userId;
 
