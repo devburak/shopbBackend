@@ -19,7 +19,10 @@ async function listFiles(pageNumber, pageSize, searchKey) {
     return {
       totalCount,
       totalPages,
-      files,
+      pageNumber,
+      pageSize,
+      files
+     
     };
   }
   

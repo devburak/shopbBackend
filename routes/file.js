@@ -72,7 +72,6 @@ router.get('/list', jwtAuthMiddleware, async (req, res) => {
     if (req.user.role !== 'admin' && req.user.role !== 'staff') {
       return res.status(403).json({ error: 'Yetkisiz erişim' });
     }
-  
     try {
       const pageNumber = parseInt(req.query.page) || 1;
       const pageSize = parseInt(req.query.pageSize) || 20;

@@ -16,8 +16,10 @@ const jwtAuthMiddleware = (req, res, next) => {
 };
 
 function isAdmin(req, res,jwtAuthMiddleware, next) {
-  const { role } = req.user;
+  const { role ,userId} = req.user;
+ 
   if (role !== 'admin') {
+    
     return res.status(403).json({ error: 'Bu işlem için yetkiniz yok' });
   }
   next();
@@ -25,6 +27,7 @@ function isAdmin(req, res,jwtAuthMiddleware, next) {
 
 function isAdminroStaff(req, res,jwtAuthMiddleware, next) {
   const { role } = req.user;
+
   if (role !== 'admin' || role !=='staff') {
     return res.status(403).json({ error: 'Bu işlem için yetkiniz yok' });
   }
