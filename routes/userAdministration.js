@@ -56,13 +56,13 @@ router.post('/user', jwtAuthMiddleware, async (req, res) => {
             return res.status(409).json({ error: 'E-posta veya kullanıcı adı zaten kullanılıyor.' });
         }
         
-      // Şifrenin hashlenmesi
-      const hashedPassword = await bcrypt.hash(password, 10);
+      // // Şifrenin hashlenmesi
+      // const hashedPassword = await bcrypt.hash(password, 10);
   
       // Yeni kullanıcı oluşturma
       const user = new User({
         username,
-        password: hashedPassword,
+        password: password,
         name,
         email,
         phone,
@@ -74,6 +74,7 @@ router.post('/user', jwtAuthMiddleware, async (req, res) => {
   
       return res.status(201).json({ message: 'Kullanıcı oluşturuldu' });
     } catch (err) {
+      console.log(err)
       return res.status(500).json({ error: 'Kullanıcı oluşturulurken bir hata oluştu' });
     }
   });
