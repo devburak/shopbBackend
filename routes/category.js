@@ -8,26 +8,28 @@ const Category = require('../db/models/category');
 // Tüm kategorileri getir
 router.get('/', async (req, res) => {
     try {
-        const { page = 1, limit = 10, search } = req.query;
-        const options = {
-            page: parseInt(page),
-            limit: parseInt(limit)
-        };
-
-        let query = {};
-
-        if (search) {
-            query = { title: { $regex: search, $options: 'i' } };
-        }
-
-        const categories = await Category.paginate(query, options);
-
-        res.status(200).json(categories);
+      const { page = 1, limit = 25, search } = req.query;
+      const options = {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        populate: { path: 'imageId', select: 'fileName size mimeType fileUrl thumbnailUrl' }
+      };
+  
+      let query = {};
+  
+      if (search) {
+        query = { title: { $regex: search, $options: 'i' } };
+      }
+  
+      const categories = await Category.paginate(query, options);
+  
+      res.status(200).json(categories);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Bir hata oluştu' });
+      console.error(error);
+      res.status(500).json({ error: 'Bir hata oluştu' });
     }
-});
+  });
+  
 
 router.get('/withnop', jwtAuthMiddleware, async (req, res) => {
     try {
@@ -57,7 +59,7 @@ router.get('/withnop', jwtAuthMiddleware, async (req, res) => {
                 title: category.title,
                 description: category.description,
                 slug: category.slug,
-                imageUrl: category.imageUrl,
+                imageId: category.imageId,
                 numOfProducts: numOfProducts
             };
             categoryData.push(categoryInfo);
@@ -73,43 +75,45 @@ router.get('/withnop', jwtAuthMiddleware, async (req, res) => {
     }
 });
 
-router.get('/byid/:id', async (req,res)=>{
-    try{
-        const {id} = req.params
-        const category = await Category.findById(id)
-        res.status(200).json(category)
-
-    }catch(error){
-        console.log(error);
-        res.status(500).json({error: 'Bir hata oluştu'})
-
+router.get('/byid/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const category = await Category.findById(id).populate('image');
+      res.status(200).json(category);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'Bir hata oluştu' });
     }
-})
+  });
 
 // Yeni kategori oluşturma
 router.post('/', jwtAuthMiddleware.isAdmin, async (req, res) => {
     try {
-        const { title, description, slug, imageUrl } = req.body;
-
-        // Gerekli alanların kontrolü
-        if (!title || !description || !slug) {
-            return res.status(400).json({ error: 'Lütfen gerekli alanları doldurun' });
-        }
-        // Yeni kategoriyi oluştur
-        const newCategory = new Category({
-            title,
-            description,
-            slug,
-            imageUrl
-        });
-        // Kategoriyi kaydet
-        const savedCategory = await newCategory.save();
-        res.status(201).json(savedCategory);
+      const { title, description, slug, image } = req.body;
+  
+      // Gerekli alanların kontrolü
+      if (!title || !description || !slug) {
+        return res.status(400).json({ error: 'Lütfen gerekli alanları doldurun' });
+      }
+  
+      // Yeni kategoriyi oluştur
+      const newCategory = new Category({
+        title,
+        description,
+        slug,
+        image
+      });
+  
+      // Kategoriyi kaydet
+      const savedCategory = await newCategory.save();
+  
+      res.status(201).json(savedCategory);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Bir hata oluştu' });
+      console.error(error);
+      res.status(500).json({ error: 'Bir hata oluştu' });
     }
-});
+  });
+  
 
 // Kategori güncelleme
 router.put('/:id', jwtAuthMiddleware.isAdmin, async (req, res) => {
