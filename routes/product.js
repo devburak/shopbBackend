@@ -67,5 +67,24 @@ router.post('/',jwtAuthMiddleware, async (req, res) => {
   }
 });
 
+// PUT /api/product/:productId
+router.put('/:productId',jwtAuthMiddleware, async (req, res) => {
+    try {
+      const productId = req.params.productId;
+      const updateData = req.body;
+  
+      const updatedProduct = await Product.findByIdAndUpdate(productId, updateData, { new: true });
+  
+      if (!updatedProduct) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
+      res.json(updatedProduct);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred while updating the product' });
+    }
+  });
+
 module.exports = router;
   

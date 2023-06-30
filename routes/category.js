@@ -5,7 +5,7 @@ const jwtAuthMiddleware = require('../middleware/jwtAuth');
 const Product = require('../db/models/product')
 const Category = require('../db/models/category');
 
-// Tüm kategorileri getir
+// Tüm
 router.get('/', async (req, res) => {
     try {
       const { page = 1, limit = 25, search } = req.query;
@@ -22,6 +22,24 @@ router.get('/', async (req, res) => {
       }
   
       const categories = await Category.paginate(query, options);
+  
+      res.status(200).json(categories);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Bir hata oluştu' });
+    }
+  });
+  
+  router.get('/all', async (req, res) => {
+    try {
+      const { search } = req.query;
+  
+      let query = {};
+  
+      if (search) {
+        query = { title: { $regex: search, $options: 'i' } };
+      }
+      const categories = await Category.find(query)
   
       res.status(200).json(categories);
     } catch (error) {
