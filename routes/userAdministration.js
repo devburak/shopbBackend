@@ -4,8 +4,8 @@ const express = require('express');
 const router = express.Router();
 const User = require('../db/models/user');
 const Profile = require('../db/models/profile');
-const jwtAuthMiddleware = require('../middleware/jwtAuth');
-const isAdmin = require('../middleware/jwtAuth.js')
+const {jwtAuthMiddleware , isAdmin} = require('../middleware/jwtAuth');
+
 // Tüm kullanıcıların rolünü güncelleme (Sadece admin yetkisi gerektirir)
 router.put('/users/:userId/role', jwtAuthMiddleware,isAdmin, async (req, res) => {
   try {

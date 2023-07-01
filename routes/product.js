@@ -2,7 +2,7 @@
 const express = require('express');
 const Product = require('../db/models/product');
 const User = require('../db/models/user');
-const jwtAuthMiddleware = require('../middleware/jwtAuth');
+const {jwtAuthMiddleware} = require('../middleware/jwtAuth');
 const router = express.Router();
 
 router.get('/', async (req, res) => {

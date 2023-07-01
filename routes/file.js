@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const { uploadFile , deleteFile} = require('../storage/minioService');
 const {listFiles} =require('../services/file')
-const jwtAuthMiddleware = require('../middleware/jwtAuth');
+const {jwtAuthMiddleware} = require('../middleware/jwtAuth');
 const fs = require('fs');
 const StoredFile = require('../db/models/storedFiles');
 

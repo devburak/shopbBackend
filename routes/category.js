@@ -1,7 +1,7 @@
 // routes/category.js
 const express = require('express');
 const router = express.Router();
-const jwtAuthMiddleware = require('../middleware/jwtAuth');
+const {jwtAuthMiddleware,isAdmin,isAdminOrStaff} = require('../middleware/jwtAuth');
 const Product = require('../db/models/product')
 const Category = require('../db/models/category');
 
@@ -49,8 +49,13 @@ router.get('/', async (req, res) => {
   });
   
 
-router.get('/withnop', jwtAuthMiddleware, async (req, res) => {
+router.get('/withnop', jwtAuthMiddleware ,isAdminOrStaff, async (req, res) => {
+    //Kullanıcının rolünü kontrol et
+    // if (req.user.role !== 'admin' && req.user.role !== 'staff') {
+    //     return res.status(403).json({ error: 'Yetkisiz erişim' });
+    //   }
     try {
+
         const { page = 1, limit = 25, sort } = req.query;
         const options = {
             page: parseInt(page),
@@ -105,7 +110,7 @@ router.get('/byid/:id', async (req, res) => {
   });
 
 // Yeni kategori oluşturma
-router.post('/', jwtAuthMiddleware.isAdmin, async (req, res) => {
+router.post('/', jwtAuthMiddleware,isAdmin, async (req, res) => {
     try {
       const { title, description, slug, image } = req.body;
   
@@ -134,7 +139,7 @@ router.post('/', jwtAuthMiddleware.isAdmin, async (req, res) => {
   
 
 // Kategori güncelleme
-router.put('/:id', jwtAuthMiddleware.isAdmin, async (req, res) => {
+router.put('/:id', jwtAuthMiddleware,isAdmin, async (req, res) => {
     try {
         const { title, description, slug, imageUrl } = req.body;
 
