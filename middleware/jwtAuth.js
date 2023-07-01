@@ -34,7 +34,6 @@ function isAdmin(req, res, next) {
 
 function isAdminOrStaff(req, res, next) {
   const { role } = req.user;
-  console.log(req.user)
   if (role !== 'admin' && role !== 'staff') {
     return res.status(403).json({ error: 'Yetkisiz erişim' });
   }
