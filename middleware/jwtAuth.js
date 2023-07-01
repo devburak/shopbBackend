@@ -2,7 +2,6 @@
 const jwtConfig = require('../config/jwtConfig');
 
 const jwtAuthMiddleware = (req, res, next) => {
-  console.log('jwt')
   // Token doğrulama işlemini gerçekleştir
   const token = req.headers.authorization?.split(' ')[1] || '';
   try {

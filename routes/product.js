@@ -2,12 +2,12 @@
 const express = require('express');
 const Product = require('../db/models/product');
 const User = require('../db/models/user');
-const {jwtAuthMiddleware} = require('../middleware/jwtAuth');
+const {jwtAuthMiddleware, isAdminOrStaff} = require('../middleware/jwtAuth');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-      const { page = 1, limit = 10, sort = 'name' } = req.query;
+      const { page = 1, limit = 25, sort = 'name' } = req.query;
   
       const options = {
         page: parseInt(page),
@@ -15,9 +15,7 @@ router.get('/', async (req, res) => {
         sort: sort,
         populate: 'categories' // Kategorileri doldur
       };
-  
       const products = await Product.paginate({}, options);
-  
       res.status(200).json(products);
     } catch (error) {
       console.log(error);
@@ -39,11 +37,11 @@ router.get('/byid/:id', async (req,res)=>{
 })
 
 // Create New Product
-router.post('/',jwtAuthMiddleware, async (req, res) => {
+router.post('/',jwtAuthMiddleware , isAdminOrStaff, async (req, res) => {
   try {
-    const { name, content, allergenWarnings, salesType, price, stock, categories, discount, storedFiles } = req.body;
+    const { name, content, allergenWarnings, salesType="piece", price, stock, categories, discount, storedFiles } = req.body;
     // Gerekli alanların kontrolü
-    if (!name || !content || !salesType || !price || !categories) {
+    if (!name || !content  || !price || !categories) {
         return res.status(400).json({ error: 'Lütfen gerekli alanları doldurun' });
       }
     // Yeni ürünü oluştur
@@ -68,7 +66,7 @@ router.post('/',jwtAuthMiddleware, async (req, res) => {
 });
 
 // PUT /api/product/:productId
-router.put('/:productId',jwtAuthMiddleware, async (req, res) => {
+router.put('/:productId',jwtAuthMiddleware, isAdminOrStaff, async (req, res) => {
     try {
       const productId = req.params.productId;
       const updateData = req.body;
