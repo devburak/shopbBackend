@@ -2,8 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../db/models/user');
 const Profile = require('../db/models/profile');
-const {jwtAuthMiddleware} = require('../middleware/jwtAuth');
-const  jwt =require ("jsonwebtoken");
+const { jwtAuthMiddleware, addToRevocationList } = require('../middleware/jwtAuth');
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 // Yeni kullanıcı oluşturma
@@ -95,7 +95,7 @@ router.post('/refresh-token', async (req, res) => {
 });
 
 // Profil güncelleme
-router.put('/profile' ,jwtAuthMiddleware, async (req, res) => {
+router.put('/profile', jwtAuthMiddleware, async (req, res) => {
   try {
     const { userId } = req.user; // İstekteki JWT'den kullanıcı kimliğini al
 
@@ -117,6 +117,49 @@ router.put('/profile' ,jwtAuthMiddleware, async (req, res) => {
   }
 });
 
+router.post('/logout', jwtAuthMiddleware, async (req, res) => {
+  try {
+    const tokenId = req.headers.authorization?.split(' ')[1]; // Header'dan token çekme
+    console.log(tokenId)
+    // Kullanıcının refreshToken'ını sıfırlama
+    const userId = req.user.userId; // Varsayılan olarak kullanıcı kimliği req.user içerisinde saklanıyor
+    const updatedUser = await User.findByIdAndUpdate(userId, { refreshToken: null }, { new: true });
+    // Token'ı revocation listesine ekle
+    await addToRevocationList(tokenId);
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'An error occurred while logging out' });
+  }
+});
+
+router.get('/isAuthenticated', jwtAuthMiddleware, async (req, res) => {
+  try {
+    // Kullanıcının kimliğini alın
+    const userId = req.user.userId;
+    console.log(userId)
+    // Kullanıcı profili bilgilerini getir
+    const userProfile = await Profile.findOne({ userId }).populate('userId', 'username name email phone role');
+
+    if (!userProfile) {
+      // Kullanıcı profili bulunamadıysa, sadece User modelinden bilgileri getir
+      const user = await User.findById(userId).select('_id as userId username name email phone role');
+      if (!user) {
+        return res.status(404).json({ error: 'Kullanıcı bilgisi bulunamadı',isAuthenticated: false });
+      }
+      // Kullanıcı bilgilerini döndür
+      res.status(200).json({ user: { ...user._doc, userId: user._id ,isAuthenticated: true} });
+    } else {
+      // Kullanıcı profili bulunduysa, profil ve User modelinden bilgileri birleştirerek döndür
+      const mergedProfile = { ...userProfile._doc, ...userProfile.userId._doc };
+      res.status(200).json({ userProfile: mergedProfile ,isAuthenticated: true});
+    }
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Bir hata oluştu' , isAuthenticated: false });
+  }
+});
 
 
 

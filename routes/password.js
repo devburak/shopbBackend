@@ -31,7 +31,7 @@ router.post('/forget', async (req, res) => {
     const resetCode = await generateAndSaveResetCode(user._id);
     const expireTime = process.env.PASSWORD_CODE_EXPIRE || 2
     // E-posta içeriği oluşturma
-    const resetLink = `${process.env.RESET_PASSWORD_LINK}?code=${resetCode}`;
+    const resetLink = `${process.env.RESET_PASSWORD_LINK}/${resetCode}?email=${email}`;
     const emailContent = resetPasswordEmailTemplate
       .replace('{resetCode}', resetCode)
       .replace('{resetLink}', resetLink)
@@ -100,12 +100,12 @@ router.post('/regenerate', async (req, res) => {
         // Şifre sıfırlama kodunu veritabanında kontrol etme
         const passwordReset = await PasswordReset.findOne({ userId: user._id, resetCode });
         if (!passwordReset || passwordReset.expiration < new Date()) {
-            return res.status(400).json({ error: 'Geçersiz şifre sıfırlama kodu' });
+            return res.status(400).json({ error: 'Invalid password reset code' });
         }
 
         const isSamePassword = bcrypt.compareSync(newPassword, user.password);
         if (isSamePassword) {
-            return res.status(400).json({ error: 'Yeni şifre, eski şifre ile aynı olamaz' });
+            return res.status(400).json({ error: 'The new password cannot be the same as the old password' });
         }
         // Şifreyi güncelleme
         user.password = newPassword;
@@ -128,10 +128,10 @@ router.post('/regenerate', async (req, res) => {
 
         sendEmail(email, 'Password Reset Confirmation', emailContent)
 
-        res.status(200).json({ message: 'Şifre başarıyla yenilendi ve bilgilendirme e-postası gönderildi' });
+        res.status(200).json({ message: 'Password successfully renewed and notification e-mail sent' });
     } catch (error) {
-        console.error('Şifre yenileme hatası:', error);
-        res.status(500).json({ error: 'Bir hata oluştu' });
+        console.error('Password renewal error:', error);
+        res.status(500).json({ error: 'An error occurred' });
     }
 });
 module.exports = router;
