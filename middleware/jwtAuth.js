@@ -1,7 +1,10 @@
 
+
+const RevokedToken = require('../db/models/token'); // RevokedToken modelini projenize göre yolunuza göre ayarlayın
 const jwtConfig = require('../config/jwtConfig');
 
-const jwtAuthMiddleware = (req, res, next) => {
+
+const jwtAuthMiddleware = async (req, res, next) => {
   // Token doğrulama işlemini gerçekleştir
   const token = req.headers.authorization?.split(' ')[1] || '';
   try {
@@ -11,7 +14,12 @@ const jwtAuthMiddleware = (req, res, next) => {
       req.user = { guestMail,role:"guest" ,userId:null};
       next();
     }else {
-      const decoded = jwtConfig.verifyToken(token);
+      const tokenInRevocationList = await checkTokenInRevocationList(token); // Örnek bir fonksiyon
+      if (tokenInRevocationList) {
+        throw new Error('Token has been revoked');
+      }
+      const decoded = await jwtConfig.verifyToken(token);
+      console.log(decoded)
       const userId = decoded.userId;
       const role = decoded.role; // Kullanıcının rolünü al
       req.user = { userId, role }; // Kullanıcı kimliğini istek nesnesine ekle
@@ -40,8 +48,25 @@ function isAdminOrStaff(req, res, next) {
 
 }
 
+async function addToRevocationList(tokenId) {
+  try {
+    const revokedToken = new RevokedToken({ tokenId });
+    await revokedToken.save();
+    console.log('Token revoked:', tokenId);
+  } catch (error) {
+    console.error('Revocation error:', error);
+  }
+}
+
+const checkTokenInRevocationList = async (tokenId) => {
+  const tokenInList = await RevokedToken.exists({tokenId:tokenId });
+  return tokenInList;
+};
+
 module.exports = {
   jwtAuthMiddleware,
   isAdmin,
-  isAdminOrStaff
+  isAdminOrStaff,
+  addToRevocationList,
+  checkTokenInRevocationList
 };
