@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   phone: { type: String },
   role: { type: String, default: 'customer' }, 
-  refreshToken: { type: String },
+  refreshToken: { type: String }
 });
 
 userSchema.pre('save', async function (next) {

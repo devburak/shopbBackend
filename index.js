@@ -11,6 +11,7 @@ const productRoutes = require('./routes/product');
 const categoryRoutes = require('./routes/category');
 const orderRoutes = require('./routes/order');
 const passwordRoutes = require('./routes/password')
+const systemRoutes = require('./routes/system')
 const app = express();
 app.use(express.json());
 // CORS OK
@@ -30,7 +31,8 @@ app.use('/api/file' , fileRoutes);
 app.use('/api/product' , productRoutes);
 app.use('/api/category' , categoryRoutes);
 app.use('/api/order' , orderRoutes);
-app.use('/api/password' ,passwordRoutes)
+app.use('/api/password' ,passwordRoutes);
+app.use('/api/system' ,systemRoutes);
 
   const port = process.env.PORT || 5000;
 app.listen(port, () => {

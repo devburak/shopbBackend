@@ -6,6 +6,7 @@ const addressSchema = new mongoose.Schema({
   state: String,
   city: String,
   district: String,
+  isUsed : Boolean
 });
 
 const profileSchema = new mongoose.Schema({
@@ -14,8 +15,8 @@ const profileSchema = new mongoose.Schema({
     ref: 'User',
   },
   addresses: [addressSchema],
-  preferredLanguage: String,
-  // ...
+  preferredLanguage: {type:String , default:'tr' , required:true},
+ 
 });
 
 const Profile = mongoose.model('Profile', profileSchema);
