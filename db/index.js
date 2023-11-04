@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const password = process.env.DB_PASSWORD;
 const user = process.env.DB_USER;
 
-const dbName = process.env.NODE_ENV === 'production' ? 'shop' : 'test';
+const dbName = process.env.DB_NAME;
 
 const uri = `mongodb+srv://${user}:${password}@shop.gcs4ua6.mongodb.net/${dbName}`;
 

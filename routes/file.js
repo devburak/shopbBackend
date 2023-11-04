@@ -6,6 +6,7 @@ const {listFiles} =require('../services/file')
 const {jwtAuthMiddleware} = require('../middleware/jwtAuth');
 const fs = require('fs');
 const StoredFile = require('../db/models/storedFiles');
+const r2 = require('../storage/r2service')
 
 // Multer ayarları
 const storage = multer.diskStorage({
@@ -83,5 +84,17 @@ router.get('/list', jwtAuthMiddleware, async (req, res) => {
       return res.status(500).json({ error: 'Dosya listeleme hatası' });
     }
   });
+
+router.get('/list-storage', jwtAuthMiddleware, async (req, res) => {
+  try {
+    const files = await r2.listFiles();
+    console.log(files)
+    res.status(200).json(files);
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 module.exports = router;

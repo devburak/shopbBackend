@@ -5,7 +5,7 @@ const Profile = require('../db/models/profile');
 const { jwtAuthMiddleware, addToRevocationList } = require('../middleware/jwtAuth');
 const jwt = require("jsonwebtoken");
 const router = express.Router();
-
+const {secretKey , jwtExpire , refreshExpire , refreshSecret} =require('../config/loadConfiguration')
 // Yeni kullanıcı oluşturma
 router.post('/signup', async (req, res) => {
   try {
@@ -48,10 +48,10 @@ router.post('/login', async (req, res) => {
     }
 
     // Access token oluşturma
-    const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const accessToken = jwt.sign({ userId: user._id, role: user.role }, secretKey, { expiresIn: jwtExpire });
 
     // Refresh token oluşturma
-    const refreshToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' });
+    const refreshToken = jwt.sign({ userId: user._id, role: user.role }, jwtExpire, { expiresIn: refreshExpire });
     // save Refresh token 
     user.refreshToken = refreshToken;
     await user.save();
@@ -68,7 +68,7 @@ router.post('/refresh-token', async (req, res) => {
     const { refreshToken } = req.body;
 
     // Refresh token'ı kontrol et ve kullanıcının bilgilerini al
-    const decodedToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const decodedToken = jwt.verify(refreshToken, refreshSecret);
 
     const userId = decodedToken.userId;
 
@@ -85,7 +85,7 @@ router.post('/refresh-token', async (req, res) => {
     }
 
     // Yeni bir access token oluştur
-    const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const accessToken = jwt.sign({ userId: user._id, role: user.role }, secretKey, { expiresIn: jwtExpire });
 
     res.status(200).json({ accessToken });
   } catch (error) {

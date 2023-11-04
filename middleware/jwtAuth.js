@@ -1,7 +1,7 @@
 
 
 const RevokedToken = require('../db/models/token'); // RevokedToken modelini projenize göre yolunuza göre ayarlayın
-const jwtConfig = require('../config/jwtConfig');
+const jwtConfig = require('../config/jwtconfig');
 
 
 const jwtAuthMiddleware = async (req, res, next) => {

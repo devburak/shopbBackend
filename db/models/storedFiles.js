@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const storedFilesSchema = new mongoose.Schema({
     fileName: { type: String, required: true },
@@ -11,11 +12,15 @@ const storedFilesSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    uploadedAt: {
-        type: Date,
-        default: Date.now,
-    },
+}, {
+    timestamps: true, // Otomatik olarak createdAt ve updatedAt alanlarını oluşturur
 });
+
+// updatedAt alanına indeks atayın
+storedFilesSchema.index({ updatedAt: -1 });
+
+// Plugin'i şemanıza ekleyin
+storedFilesSchema.plugin(mongoosePaginate);
 
 const StoredFile = mongoose.model('StoredFile', storedFilesSchema);
 

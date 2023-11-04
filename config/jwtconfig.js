@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
-const secretKey = process.env.JWT_SECRET; // JWT için gizli anahtar
+// const secretKey = process.env.JWT_SECRET; // JWT için gizli anahtar
+const {secretKey , jwtExpire} =require('./loadConfiguration')
 
 module.exports = {
   generateToken: (payload) => {
-    return jwt.sign(payload, secretKey, { expiresIn: '1h' }); // Token oluşturma
+    return jwt.sign(payload, secretKey, { expiresIn: jwtExpire }); // Token oluşturma
   },
   verifyToken: async (token) => {
     try {

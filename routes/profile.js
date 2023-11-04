@@ -2,7 +2,9 @@ const express = require('express');
 const Profile = require('../db/models/profile');
 const User = require('../db/models/user');
 const { jwtAuthMiddleware } = require('../middleware/jwtAuth');
+
 const router = express.Router();
+
 
 router.post('/', jwtAuthMiddleware, async (req, res) => {
   try {

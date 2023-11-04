@@ -31,3 +31,5 @@ seed.js
 
 # temp files
 uploads/
+# config files
+config/
