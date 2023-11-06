@@ -14,6 +14,10 @@ const categoryRoutes = require('./routes/category');
 const orderRoutes = require('./routes/order');
 const passwordRoutes = require('./routes/password');
 const systemRoutes = require('./routes/system');
+const tagRoutes = require('./routes/tag');
+const menuRoutes = require('./routes/menu');
+
+
 const app = express();
 app.use(express.json());
 // CORS OK
@@ -42,6 +46,8 @@ const startApp = async () => {
     app.use('/api/order', orderRoutes);
     app.use('/api/password', passwordRoutes);
     app.use('/api/system', systemRoutes);
+    app.use('/api/tags' , tagRoutes);
+    app.use('/api/menu', menuRoutes);
 
     const port = process.env.PORT || 5000;
 
