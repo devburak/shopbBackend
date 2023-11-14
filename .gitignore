@@ -28,6 +28,9 @@ build/
 db/seeds/
 seed.js
 
+#test
+testmail.js
+
 
 # temp files
 uploads/
