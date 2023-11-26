@@ -7,6 +7,7 @@ const storedFilesSchema = new mongoose.Schema({
     mimeType: { type: String, required: true },
     fileUrl: { type: String, required: true },
     thumbnailUrl: { type: String, required: false },
+    path:{ type: String, required: false },
     uploadedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

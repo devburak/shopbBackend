@@ -42,6 +42,9 @@ class FileService {
     let savedFile;
     const minioClient = await getMinioClient();
 
+    const currentYear = new Date().getFullYear();
+    const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0'); 
+
     while (attempt < maxRetries) {
       try {
 
@@ -63,9 +66,6 @@ class FileService {
 
           const filePath = file.path;
           const fileStream = fs.createReadStream(filePath);
-
-          const currentYear = new Date().getFullYear();
-          const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0'); // Ayı iki haneli formatta al
 
         const filePathInBucket = `${currentYear}/${currentMonth}/${sanitizedFileName}`;
     
@@ -130,6 +130,7 @@ class FileService {
     return {
       fileName: savedFile.fileName,
       fileUrl: savedFile.fileUrl,
+      path: `${currentYear}/${currentMonth}`,
       thumbnailFileName: savedFile.thumbnailFileName,
       thumbnailUrl: savedFile.thumbnailUrl, 
       uploadedAt: savedFile.uploadedAt,
