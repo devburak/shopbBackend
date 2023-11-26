@@ -1,13 +1,6 @@
 
  const { config }  = require("../config/loadConfiguration");
 
-// const minioClient = new Minio.Client({
-//     endPoint: "95d70b6a23d354c031e56b898e654b26.r2.cloudflarestorage.com",
-//     accessKey: 'ac4554cf0c4c4404379aad36d711bffb',
-//     secretKey: '5012163aa1f363afd0b916e8014bd1e92c2eaadbb46f781b42e6de794594332b',
-//     region:"auto"
-// });
-
 let BUCKET_NAME = config.storageClients[config.type]?.bucketName || 'test';
 const getPreferredClient = () => {
   console.log("storageConfig",config);
@@ -42,15 +35,6 @@ const listFiles = async () => {
   });
 };
 
-// const listFiles = async () => {
-//     return new Promise((resolve, reject) => {
-//         const stream = minioClient.listObjects(BUCKET_NAME, '', true);
-//         const results = [];
-//         stream.on('data', obj => results.push(obj));
-//         stream.on('error', err => reject(err));
-//         stream.on('end', () => resolve(results));
-//     });
-// };
 
 const getFile = async (fileKey) => {
     return new Promise((resolve, reject) => {
