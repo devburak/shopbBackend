@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const connectToDatabase = require('./db');
+const {connectToDatabase,isConnected} = require('./db');
 const { loadConfiguration } = require('./config/loadConfiguration'); // loadConfiguration fonksiyonunu dahil edin
 
 //routes
@@ -26,9 +26,18 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');
 });
+
 const startApp = async () => {
   try {
     await connectToDatabase(); // Veritabanına bağlan
+    // Veritabanı bağlantısının başlamasını takiben 10 saniye bekleyin
+    await new Promise(resolve => setTimeout(resolve, 20000));
+
+    while (!isConnected()) {
+      console.log('Veritabanına bağlanmayı bekliyor...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
     await loadConfiguration(); // Konfigürasyonu yükle
 
 
@@ -46,7 +55,7 @@ const startApp = async () => {
     app.use('/api/order', orderRoutes);
     app.use('/api/password', passwordRoutes);
     app.use('/api/system', systemRoutes);
-    app.use('/api/tags' , tagRoutes);
+    app.use('/api/tags', tagRoutes);
     app.use('/api/menu', menuRoutes);
 
     const port = process.env.PORT || 5000;
@@ -58,6 +67,6 @@ const startApp = async () => {
     console.error('Uygulama başlatılamadı:', error.message);
     process.exit(1); // Hata durumunda uygulamayı sonlandır
   }
-  };
+};
 
-  startApp(); // Uygulamayı başlat
+startApp(); // Uygulamayı başlat

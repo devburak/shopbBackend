@@ -1,13 +1,19 @@
 const Minio = require('minio');
+const { config, loadConfiguration } = require('../config/loadConfiguration');
 
-// Create a new Minio client
-const minioClient = new Minio.Client({
-  endPoint: process.env.MINIO_ENDPOINT,
-  port: 1*process.env.MINIO_PORT,
-  useSSL: true,
-  accessKey: process.env.MINIO_ACCESSKEY,
-  secretKey: process.env.MINIO_SECRETKEY,
-});
+let minioClient;
 
+const initializeMinioClient = async () => {
+  await loadConfiguration();
+  console.log({region:"auto",...config.storageClients})
+  minioClient = new Minio.Client({region:"auto",...config.storageClients});
+};
 
-  module.exports = {minioClient};
+const getMinioClient = async () => {
+  if (!minioClient) {
+    await initializeMinioClient();
+  }
+  return minioClient;
+};
+
+module.exports = { getMinioClient };

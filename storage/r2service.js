@@ -22,6 +22,7 @@ const uploadFile = async (file) => {
         Body: file.data,
     };
 
+
     return new Promise((resolve, reject) => {
         minioClient.putObject(BUCKET_NAME, file.name, file.data, (err, etag) => {
             if (err) reject(err);

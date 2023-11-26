@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { uploadFile , deleteFile} = require('../storage/minioService');
-const {listFiles} =require('../services/file')
+// const { uploadFile , deleteFile} = require('../storage/minioService');
+// const {listFiles} =require('../services/file')
+const {uploadFile,deleteFile,listFiles}  =require('../services/storage')
 const {jwtAuthMiddleware} = require('../middleware/jwtAuth');
 const fs = require('fs');
 const StoredFile = require('../db/models/storedFiles');
 const r2 = require('../storage/r2service')
+const { config } = require('../config/loadConfiguration'); // Dynamic Config import
+const {getMinioClient}  =require('../storage/minioClient');
 
 // Multer ayarları
 const storage = multer.diskStorage({
@@ -26,7 +29,8 @@ router.post('/upload', jwtAuthMiddleware, upload.single('file'), async (req, res
   }
   try {
     // Dosyayı yükle
-    const bucketName = process.env.MINIO_BUCKET;
+    const bucketName = config.storageClients[config.type]?.bucketName || "test";
+    console.log("bucket",bucketName)
     const filePath = req.file.path;
     const fileName = req.file.originalname;
     const uploadResponse = await uploadFile(bucketName, req.file ,req.user.userId);
@@ -45,6 +49,8 @@ router.delete('/delete/:fileId', jwtAuthMiddleware, async (req, res) => {
     const fileId = req.params.fileId;
     const userId = req.user.userId;
     const userRole = req.user.role;
+
+    const bucketName = config.storageClients[config.type].bucketName;
   
     try {
       // Dosya veritabanında bulunur mu kontrol et
@@ -56,7 +62,7 @@ router.delete('/delete/:fileId', jwtAuthMiddleware, async (req, res) => {
       // Yetkilendirme kontrolü
       if (userRole === 'admin' || (userRole === 'staff' && file.uploadedBy.toString() === userId)) {
         // Dosyayı sil
-       const deletedFile =  await deleteFile(process.env.MINIO_BUCKET, fileId, file.fileName);
+       const deletedFile =  await deleteFile(bucketName, fileId, file.fileName);
         return res.json({ message: 'Dosya başarıyla silindi' ,deletedFile});
       } else {
         return res.status(403).json({ error: 'Yetkisiz erişim' });
@@ -96,5 +102,28 @@ router.get('/list-storage', jwtAuthMiddleware, async (req, res) => {
   }
 });
 
+// Test dosya yükleme endpoint'i
+router.post('/test-upload', upload.single('file'), async (req, res) => {
+  try {
+    const minioClient = await getMinioClient();
+    const file = req.file;
+    const bucketName = 'test'; // Minio bucket adınızı buraya yazın
+    console.log('Yüklenen dosyanın yolu:', req.file.path);
+    // Dosyayı Minio'ya yükle
+    const fileStream = fs.createReadStream(file.path);
+    await minioClient.putObject(bucketName, file.originalname, fileStream);
+
+    // Yükleme başarılı
+    res.status(200).send({ message: 'Dosya başarıyla yüklendi.' });
+  } catch (error) {
+    console.error('Dosya yükleme hatası:', error);
+    res.status(500).send({ error: 'Dosya yüklenirken bir hata oluştu.' });
+  } finally {
+    // Yüklenen dosyayı sil
+    if (req.file && req.file.path) {
+      fs.unlinkSync(req.file.path);
+    }
+  }
+});
 
 module.exports = router;
