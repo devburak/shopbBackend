@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
       const options = {
         page: parseInt(page),
         limit: parseInt(limit),
-        populate: { path: 'imageId', select: 'fileName size mimeType fileUrl thumbnailUrl' }
+        populate: { path: 'image', select: 'fileName size mimeType fileUrl thumbnailUrl' }
       };
   
       let query = {};
@@ -109,8 +109,23 @@ router.get('/byid/:id', async (req, res) => {
     }
   });
 
+  router.get('/byslug/:slug', async (req, res) => {
+    try {
+      const { slug } = req.params; // URL'den slug parametresini al
+      const category = await Category.findOne({ slug: slug }).populate('image'); // Slug'a göre kategoriyi bul
+      if (!category) {
+        return res.status(404).json({ error: 'Kategori bulunamadı' }); // Kategori bulunamazsa 404 dön
+      }
+      res.status(200).json(category); // Kategoriyi JSON olarak dön
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'Bir hata oluştu' }); // Hata durumunda 500 dön
+    }
+  });
+  
+
 // Yeni kategori oluşturma
-router.post('/', jwtAuthMiddleware,isAdmin, async (req, res) => {
+router.post('/', jwtAuthMiddleware, async (req, res) => {
     try {
       const { title, description, slug, image } = req.body;
   

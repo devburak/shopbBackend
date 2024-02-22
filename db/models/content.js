@@ -1,20 +1,82 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
-
 const contentSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
-    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
-    status: { type: String, enum: ['draft', 'published'], default: 'draft' },
-    publishedDate: { type: Date },
-    images: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StoredFile' }],
-    summary: { type: String },
-    attributes: { type: Map, of: String },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    title: {
+        type: String,
+        required: true
+    },
+    slug: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true
+    },
+    categories: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Category', 
+        required: true 
+    }],
+    status: {
+        type: String,
+        enum: ['draft', 'published'],
+        default: 'draft',
+        index: true
+    },
+    publishedDate: {
+        type: Date,
+        index: true
+    },
+    tags: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tag',
+        index: true
+    }],
+    images: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'StoredFile'
+    }],
+    summary: {
+        type: String
+    },
+    attributes: {
+        type: Map,
+        of: String
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+        index: true
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now,
+        index: true
+    },
+    period: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Period'
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    root: {
+        type: String,
+        required: true,
+        get: data => JSON.parse(data),
+        set: data => JSON.stringify(data)
+    }
 });
-// Pagination pluginini ekle
-contentSchema.plugin(mongoosePaginate);
+
+// Getter'ların çalışması için aşağıdaki seçeneği schema'ya ekleyin
+contentSchema.set('toJSON', { getters: true, virtuals: true });
+contentSchema.set('toObject', { getters: true, virtuals: true });
+
 
 const contentVersionSchema = new mongoose.Schema({
     contentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Content' },
@@ -24,7 +86,8 @@ const contentVersionSchema = new mongoose.Schema({
 });
 
 contentVersionSchema.plugin(mongoosePaginate);
-
+// Pagination pluginini ekle
+contentSchema.plugin(mongoosePaginate);
 const ContentVersion = mongoose.model('ContentVersion', contentVersionSchema);
 const Content = mongoose.model('Content', contentSchema);
 

@@ -1,11 +1,11 @@
 
  const { config }  = require("../config/loadConfiguration");
 
-let BUCKET_NAME = config.storageClients[config.type]?.bucketName || 'test';
+let BUCKET_NAME = config.storageClients?.bucketName || 'test';
 const getPreferredClient = () => {
   console.log("storageConfig",config);
-  BUCKET_NAME = config.storageClients[config.type]?.bucketName || 'test';
-  return config.storageClients[config.type];
+  BUCKET_NAME = config.storageClients?.bucketName || 'test';
+  return config.storageClients;
 };
 
 const uploadFile = async (file) => {

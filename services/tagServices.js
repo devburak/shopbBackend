@@ -29,19 +29,19 @@ const tagServices = {
     }
   },
 
-  // Tag kullanım sayısını güncelleme (usageCount)
-  updateTagUsageCount: async (tagId, increment) => {
-    try {
-      const updatedTag = await Tag.findByIdAndUpdate(
-        tagId,
-        { $inc: { usageCount: increment } },
-        { new: true }
-      );
-      return updatedTag;
-    } catch (error) {
-      throw error;
-    }
-  },
+  // // Tag kullanım sayısını güncelleme (usageCount)
+  // updateTagUsageCount: async (tagId, increment) => {
+  //   try {
+  //     const updatedTag = await Tag.findByIdAndUpdate(
+  //       tagId,
+  //       { $inc: { usageCount: increment } },
+  //       { new: true }
+  //     );
+  //     return updatedTag;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // },
 
   // Tag silme ve ilgili içeriklerden kaldırma
   deleteTag: async (tagId) => {
