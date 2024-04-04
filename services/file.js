@@ -12,7 +12,11 @@ async function listFiles(pageNumber, pageSize, searchKey, excludeIds = [], fileT
   }
 
   if (fileType) {
-    query.mimeType = fileType; // Belirli bir dosya türüne göre filtrele
+    if (fileType === 'image') {
+      query.mimeType = { $regex: '^image\/.*', $options: 'i' }; // Tüm 'image/*' mimeType'larına uyan dosyaları filtrele
+    } else if (fileType === 'application') {
+      query.mimeType = { $regex: '^application\/.*', $options: 'i' }; // Tüm 'application/*' mimeType'larına uyan dosyaları filtrele
+    }
   }
 
   const totalCount = await StoredFile.countDocuments(query);
@@ -33,6 +37,6 @@ async function listFiles(pageNumber, pageSize, searchKey, excludeIds = [], fileT
   };
 }
 
-  
 
-module.exports = {listFiles};
+
+module.exports = { listFiles };

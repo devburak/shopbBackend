@@ -70,7 +70,10 @@ const contentSchema = new mongoose.Schema({
         required: true,
         get: data => JSON.parse(data),
         set: data => JSON.stringify(data)
-    }
+    },
+    spot: {
+        type: String
+    },
 });
 
 // Getter'ların çalışması için aşağıdaki seçeneği schema'ya ekleyin
